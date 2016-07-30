@@ -3,26 +3,25 @@
 // Visit www.toptal.com/blog and subscribe to our newsletter to read great posts
 ////////
 
-var remote = require('remote'),
-    remoteIpc = remote.require('ipc');
+const {ipcMain} = require('electron').remote;
 
 angular
-    .module('MainView', ['Utils'])
-    .controller('MainCtrl', ['Storage', '$scope', function(Storage, scope) {
-        var vm = this;
-        vm.keychain = null;
+  .module('MainView', ['Utils'])
+  .controller('MainCtrl', ['Storage', '$scope', function(Storage, scope) {
+    let vm = this;
+    vm.keychain = null;
 
-        Storage
-            .init()
-            .then(function(db) {
-                vm.keychain = db.getDocs();
+    Storage
+      .init()
+      .then((db) => {
+        vm.keychain = db.getDocs();
 
-                remoteIpc.on('update-main-view', function() {
-                    Storage
-                        .reload()
-                        .then(function() {
-                            vm.keychain = db.getDocs();
-                        });
-                });
+        ipcMain.on('update-main-view', () => {
+          Storage
+            .reload()
+            .then(() => {
+              vm.keychain = db.getDocs();
             });
-    }]);
+        });
+      });
+  }]);

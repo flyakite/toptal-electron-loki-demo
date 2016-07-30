@@ -3,28 +3,25 @@
 // Visit www.toptal.com/blog and subscribe to our newsletter to read great posts
 ////////
 
-var remote = require('remote'),
-    remoteIpc = remote.require('ipc');
+const {remote} = require('electron');
+const {ipcMain} = remote.require('electron');
 
-angular
-    .module('InsertView', ['Utils'])
-    .controller('InsertCtrl', ['Storage', '$scope', function(Storage, scope) {
-        var vm = this;
+angular.module('InsertView', ['Utils'])
+.controller('InsertCtrl', ['Storage', '$scope', function (Storage, scope) {
+  let vm = this;
 
-        vm.loaded = false;
-        vm.formData = {};
+  vm.loaded = false;
+  vm.formData = {};
 
-        function init() {
-            // disable formfields if db is not ready
-            vm.loaded = false;
-            // init the Storage so we can save the docs
-            Storage
-                .init()
-                .then(function() {
-                    vm.loaded = true;
-                });
-        }
+  function init() {
+    // disable formfields if db is not ready
+    vm.loaded = false;
+    // init the Storage so we can save the docs
+    Storage.init().then( () => {
+      vm.loaded = true;
+    });
+  }
 
-        init();
-        remoteIpc.on('reload-insert-view', init);
-    }]);
+  init();
+  ipcMain.on('reload-insert-view', init);
+}]);
